@@ -1,15 +1,33 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod items_list;
+use items_list::ItemsList;
+use std::sync::Mutex;
+use tauri::State;
+
+struct Items(Mutex<ItemsList>);
+
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn fetch_word_count(items: State<Items>) -> usize {
+    let mut itm = items.0.lock().unwrap();
+    let count = itm.get_word_count();
+    return count;
+}
+
+#[tauri::command]
+fn fetch_all_words(items: State<Items>) -> Vec<String> {
+    let mut itm = items.0.lock().unwrap();
+    return itm.get_all_words();
 }
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .manage::<Items>(Items(Mutex::new(ItemsList::new(
+            "C:/Users/Jupi/Desktop/wbDictionary.json",
+        ))))
+        .invoke_handler(tauri::generate_handler![fetch_word_count, fetch_all_words])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
