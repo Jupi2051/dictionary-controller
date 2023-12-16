@@ -1,5 +1,3 @@
-use serde::ser::{Serialize, SerializeStruct, Serializer};
-use serde_json::{Result, Value};
 use std::cmp::Ordering;
 use std::fs;
 
@@ -49,13 +47,50 @@ impl ItemsList {
         }
 
         None
-        // TODO: binary search into the list to find a certain word
     }
 
-    pub fn insert_word(&mut self, word: String) {
+    fn does_word_exist(&self, word: &str) -> bool {
+        let words: &Vec<String> = &self.words;
+
+        let mut low: usize = 0;
+        let mut high: usize = words.len();
+
+        loop {
+            let mid: usize = (high + low) / 2;
+            let mid_word: &String = &words[mid];
+
+            if mid_word.eq(word) {
+                return true;
+            }
+
+            let compare_result: Ordering = word.cmp(&mid_word);
+
+            if compare_result == Ordering::Greater {
+                low = mid;
+            } else if compare_result == Ordering::Less {
+                high = mid;
+            }
+
+            if (high <= low) || ((high - low) == 1) {
+                break;
+            }
+        }
+
+        false
+    }
+
+    pub fn insert_word(&mut self, word: String) -> bool {
+        let word_present: bool = self.does_word_exist(&word);
+
+        if word_present == true {
+            return false;
+        }
+
         self.words.insert(0, word);
-        // TODO: insert a word into the list and re-order
+
         self.sort_all_words();
+
+        true
     }
 
     pub fn remove_word(&mut self, word: &str) -> bool {
@@ -85,7 +120,6 @@ impl ItemsList {
 
     pub fn get_all_words(&mut self) -> Vec<String> {
         let copied_vec: Vec<String> = self.words.iter().cloned().collect();
-        // Return the copied vector
         return copied_vec;
     }
 }
