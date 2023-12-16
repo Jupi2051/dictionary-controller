@@ -29,6 +29,13 @@ fn delete_word(id: &str, items: State<Items>) -> bool {
     success
 }
 
+#[tauri::command]
+fn insert_word(word: &str, items: State<Items>) -> bool {
+    let mut itm = items.0.lock().unwrap();
+    let success: bool = itm.insert_word(word.to_string());
+    success
+}
+
 fn main() {
     tauri::Builder::default()
         .manage::<Items>(Items(Mutex::new(ItemsList::new(
@@ -37,7 +44,8 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             fetch_word_count,
             fetch_all_words,
-            delete_word
+            delete_word,
+            insert_word
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
