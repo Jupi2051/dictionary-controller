@@ -1,51 +1,60 @@
 import { createSignal } from "solid-js";
-import logo from "./assets/logo.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
+import ItemList from "./Components/ItemList";
+import { itemData } from "./Components/ItemList/ItemsList";
+import { fetchAllWords } from "./IPC/fetchAllWords";
+import { debounce } from "@solid-primitives/scheduled";
 
 function App() {
-  const [greetMsg, setGreetMsg] = createSignal("");
-  const [name, setName] = createSignal("");
+  const [wordCount, setWordCount] = createSignal<number>(0);
+  const [words, setWordsList] = createSignal<itemData[]>([]);
+  const [searchFilter, SetSearchFilter] = createSignal<string>("");
+
+  const search = debounce((text: string) => {
+    console.log(text);
+  }, 250);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name: name() }));
+    const wordCount = (await invoke("fetch_word_count")) as number;
+    setWordCount(wordCount);
+  }
+
+  async function getItemsList() {
+    const words: string[] = await fetchAllWords();
+    const mappedWords: itemData[] = words.map((word) => {
+      return { name: word, value: word };
+    });
+    setWordsList(mappedWords);
+  }
+
+  function onSearchChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    SetSearchFilter(target.value);
+  }
+
+  async function onInsertNewWord() {
+    console.log(searchFilter());
+    const success = (await invoke("insert_word", {
+      word: searchFilter(),
+    })) as boolean;
+    console.log(success);
   }
 
   return (
-    <div class="container">
-      <h1>Welcome to Tauri!</h1>
-
-      <div class="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" class="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" class="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://solidjs.com" target="_blank">
-          <img src={logo} class="logo solid" alt="Solid logo" />
-        </a>
-      </div>
-
-      <p>Click on the Tauri, Vite, and Solid logos to learn more.</p>
-
-      <form
-        class="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-
-      <p>{greetMsg()}</p>
+    <div class="app-container">
+      <ItemList list={words()} />
+      <button onclick={greet}>Click me for count</button>
+      <button onclick={getItemsList}>Click me to see all words</button>
+      <div>{wordCount()}</div>
+      <input
+        placeholder="new word..."
+        type="text"
+        value={searchFilter()}
+        onInput={onSearchChange}
+      />
+      <button onclick={onInsertNewWord}>Insert word</button>
     </div>
   );
 }
