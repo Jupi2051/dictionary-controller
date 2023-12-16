@@ -1,7 +1,5 @@
-# Tauri + Solid + Typescript
+# Dicitionary Controller
 
-This template should help get you started developing with Tauri, Solid and Typescript in Vite.
+A very simple project to insert, delete, and sort a .JSON array of English words made with Tauri 💖
 
-## Recommended IDE Setup
-
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+_This was made for a personal project as well as learning Rust and testin gout SolidJS in the process but i don't mind sharing it with the world!_
