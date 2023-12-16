@@ -4,16 +4,11 @@ import "./App.css";
 import ItemList from "./Components/ItemList";
 import { itemData } from "./Components/ItemList/ItemsList";
 import { fetchAllWords } from "./IPC/fetchAllWords";
-import { debounce } from "@solid-primitives/scheduled";
 
 function App() {
   const [wordCount, setWordCount] = createSignal<number>(0);
   const [words, setWordsList] = createSignal<itemData[]>([]);
   const [searchFilter, SetSearchFilter] = createSignal<string>("");
-
-  const search = debounce((text: string) => {
-    console.log(text);
-  }, 250);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
