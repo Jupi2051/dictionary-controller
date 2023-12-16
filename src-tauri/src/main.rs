@@ -22,12 +22,23 @@ fn fetch_all_words(items: State<Items>) -> Vec<String> {
     return itm.get_all_words();
 }
 
+#[tauri::command]
+fn delete_word(id: &str, items: State<Items>) -> bool {
+    let mut itm = items.0.lock().unwrap();
+    let success: bool = itm.remove_word(&id);
+    success
+}
+
 fn main() {
     tauri::Builder::default()
         .manage::<Items>(Items(Mutex::new(ItemsList::new(
             "C:/Users/Jupi/Desktop/wbDictionary.json",
         ))))
-        .invoke_handler(tauri::generate_handler![fetch_word_count, fetch_all_words])
+        .invoke_handler(tauri::generate_handler![
+            fetch_word_count,
+            fetch_all_words,
+            delete_word
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
