@@ -1,0 +1,14 @@
+.items-list-container {
+    min-height: 600px;
+    height: 80dvh;
+    overflow-y: auto;
+    width: fit-content;
+    font-size: 1.3em;
+    background-color: rgb(27, 27, 27);
+}
+
+.items-list-ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+}

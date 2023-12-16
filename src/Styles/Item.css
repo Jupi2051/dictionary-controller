@@ -1,0 +1,16 @@
+.list-item-clickable {
+    background-color: rgba(0, 0, 0, 0);
+    position: relative;
+}
+
+.list-item-clickable:hover {
+    background-color: rgba(153, 153, 153, 0.301);
+    cursor: pointer;
+}
+
+.list-item-clickable::after {
+    content: "X";
+    color: white;
+    position: absolute;
+    right: 1rem;
+}
